@@ -18,7 +18,7 @@
         tools:text="Previous result: 4" />
 
     <EditText
-        android:id="@+id/min_value"
+        android:id="@+id/min_value_edit_text"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
@@ -30,7 +30,7 @@
         app:layout_constraintTop_toBottomOf="@id/previous_result" />
 
     <EditText
-        android:id="@+id/max_value"
+        android:id="@+id/max_value_edit_text"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:hint="Max"
@@ -38,17 +38,17 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/min_value" />
+        app:layout_constraintTop_toBottomOf="@id/min_value_edit_text" />
 
     <Button
-        android:id="@+id/generate"
+        android:id="@+id/generate_button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:text="Generate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/max_value" />
+        app:layout_constraintTop_toBottomOf="@id/max_value_edit_text" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

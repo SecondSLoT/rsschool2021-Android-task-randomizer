@@ -7,19 +7,15 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.rsschool.android2021.databinding.FragmentFirstBinding
 import java.lang.RuntimeException
 
 class FirstFragment : Fragment() {
 
-    private var generateButton: Button? = null
-    private var previousResult: TextView? = null
-    private var minValueEditText: EditText? = null
-    private var maxValueEditText: EditText? = null
-
+    private var _binding: FragmentFirstBinding? = null
+    private val binding
+        get() = _binding!!
     private lateinit var callbacks: Callbacks
 
     interface Callbacks {
@@ -39,40 +35,32 @@ class FirstFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_first, container, false)
+    ): View {
+        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindViews(view)
-
         val result = arguments?.getInt(PREVIOUS_RESULT_KEY)
         val previousResultString = "Previous result: $result"
-        previousResult?.text = previousResultString
+        binding.previousResult.text = previousResultString
 
         enableGenerateButton(false)
         val numberTextWatcher = NumberTextWatcher()
-        minValueEditText?.addTextChangedListener(numberTextWatcher)
-        maxValueEditText?.addTextChangedListener(numberTextWatcher)
+        binding.minValueEditText.addTextChangedListener(numberTextWatcher)
+        binding.maxValueEditText.addTextChangedListener(numberTextWatcher)
 
-        generateButton?.setOnClickListener {
-            val min = minValueEditText?.text.toString().toInt()
-            val max = maxValueEditText?.text.toString().toInt()
+        binding.generateButton.setOnClickListener {
+            val min = binding.minValueEditText.text.toString().toInt()
+            val max = binding.maxValueEditText.text.toString().toInt()
             callbacks.onGenerateButtonClicked(min, max)
         }
     }
 
-    private fun bindViews(view: View) {
-        previousResult = view.findViewById(R.id.previous_result)
-        generateButton = view.findViewById(R.id.generate)
-        minValueEditText = view.findViewById(R.id.min_value)
-        maxValueEditText = view.findViewById(R.id.max_value)
-    }
-
     private fun enableGenerateButton(enable: Boolean) {
-        generateButton?.isEnabled = enable
+        binding.generateButton.isEnabled = enable
     }
 
     companion object {
@@ -87,6 +75,11 @@ class FirstFragment : Fragment() {
             fragment.arguments = args
             return fragment
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     inner class NumberTextWatcher : TextWatcher {
@@ -109,9 +102,9 @@ class FirstFragment : Fragment() {
 
             if (value < Int.MAX_VALUE) {
 
-                if (p0 == minValueEditText?.editableText) {
+                if (p0 == binding.minValueEditText.editableText) {
                     min = p0.toString().toInt()
-                } else if (p0 == maxValueEditText?.editableText) {
+                } else if (p0 == binding.maxValueEditText.editableText) {
                     max = p0.toString().toInt()
                 }
 

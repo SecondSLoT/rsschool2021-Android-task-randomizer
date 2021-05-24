@@ -9,13 +9,15 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import com.rsschool.android2021.databinding.FragmentSecondBinding
 import java.lang.RuntimeException
 import kotlin.random.Random
 
 class SecondFragment() : Fragment() {
 
-    private var backButton: Button? = null
-    private var result: TextView? = null
+    private var _binding: FragmentSecondBinding? = null
+    private val binding
+        get() = _binding!!
 
     private lateinit var callbacks: Callbacks
 
@@ -36,37 +38,31 @@ class SecondFragment() : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_second, container, false)
+    ): View {
+        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindViews(view)
-
         val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
         val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
 
-        result?.text = generate(min, max).toString()
+        binding.result.text = generate(min, max).toString()
 
-        backButton?.setOnClickListener {
-            callbacks.onBackButtonClicked(result?.text.toString().toInt())
+        binding.backButton.setOnClickListener {
+            callbacks.onBackButtonClicked(binding.result.text.toString().toInt())
         }
 
         requireActivity()
             .onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    callbacks.onBackButtonClicked(result?.text.toString().toInt())
+                    callbacks.onBackButtonClicked(binding.result.text.toString().toInt())
                 }
             })
 
-    }
-
-    private fun bindViews(view: View) {
-        result = view.findViewById(R.id.result)
-        backButton = view.findViewById(R.id.back)
     }
 
     private fun generate(min: Int, max: Int): Int {
