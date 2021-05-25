@@ -84,7 +84,7 @@ class SecondFragment() : Fragment() {
         private var fragment: SecondFragment? = null
 
         @JvmStatic
-        fun newInstance(min: Int, max: Int): SecondFragment {
+        fun getInstance(min: Int, max: Int): SecondFragment {
             if (fragment == null) {
                 fragment = SecondFragment()
             }

@@ -17,18 +17,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void openFirstFragment(int previousNumber) {
-        final Fragment firstFragment = FirstFragment.getInstance(previousNumber);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, firstFragment)
-                .commit();
+        startFragment(FirstFragment.getInstance(previousNumber));
     }
 
     private void openSecondFragment(int min, int max) {
-        final Fragment secondFragment = SecondFragment.newInstance(min, max);
+        startFragment(SecondFragment.getInstance(min, max));
+    }
+
+    private void startFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, secondFragment)
+                .replace(R.id.container, fragment)
                 .commit();
     }
 
