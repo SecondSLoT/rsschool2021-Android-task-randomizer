@@ -17,7 +17,7 @@ class SecondFragment() : Fragment() {
     private val binding
         get() = _binding!!
 
-    private lateinit var callbacks: Callbacks
+    private var callbacks: Callbacks? = null
 
     interface Callbacks {
         fun onBackButtonClicked(previousNumber: Int)
@@ -50,14 +50,14 @@ class SecondFragment() : Fragment() {
         binding.result.text = generate(min, max).toString()
 
         binding.backButton.setOnClickListener {
-            callbacks.onBackButtonClicked(binding.result.text.toString().toInt())
+            callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
         }
 
         requireActivity()
             .onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    callbacks.onBackButtonClicked(binding.result.text.toString().toInt())
+                    callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
                 }
             })
 
@@ -67,19 +67,33 @@ class SecondFragment() : Fragment() {
         return Random.nextInt(min, max)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
+
     companion object {
 
         private const val MIN_VALUE_KEY = "MIN_VALUE"
         private const val MAX_VALUE_KEY = "MAX_VALUE"
+        private var fragment: SecondFragment? = null
 
         @JvmStatic
         fun newInstance(min: Int, max: Int): SecondFragment {
-            val fragment = SecondFragment()
+            if (fragment == null) {
+                fragment = SecondFragment()
+            }
+
             val args = Bundle()
             args.putInt(MIN_VALUE_KEY, min)
             args.putInt(MAX_VALUE_KEY, max)
-            fragment.arguments = args
-            return fragment
+            fragment!!.arguments = args
+            return fragment!!
         }
     }
 }

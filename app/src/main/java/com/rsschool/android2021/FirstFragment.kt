@@ -16,7 +16,7 @@ class FirstFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private val binding
         get() = _binding!!
-    private lateinit var callbacks: Callbacks
+    private var callbacks: Callbacks? = null
 
     interface Callbacks {
         fun onGenerateButtonClicked(min: Int, max: Int)
@@ -55,31 +55,46 @@ class FirstFragment : Fragment() {
         binding.generateButton.setOnClickListener {
             val min = binding.minValueEditText.text.toString().toInt()
             val max = binding.maxValueEditText.text.toString().toInt()
-            callbacks.onGenerateButtonClicked(min, max)
+            callbacks?.onGenerateButtonClicked(min, max)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.minValueEditText.text = null
+        binding.maxValueEditText.text = null
     }
 
     private fun enableGenerateButton(enable: Boolean) {
         binding.generateButton.isEnabled = enable
     }
 
-    companion object {
-
-        private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
-
-        @JvmStatic
-        fun newInstance(previousResult: Int): FirstFragment {
-            val fragment = FirstFragment()
-            val args = Bundle()
-            args.putInt(PREVIOUS_RESULT_KEY, previousResult)
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
+    }
+
+    companion object {
+
+        private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
+        private var fragment: FirstFragment? = null
+
+        @JvmStatic
+        fun getInstance(previousResult: Int): FirstFragment {
+            if (fragment == null) {
+                fragment = FirstFragment()
+            }
+
+            val args = Bundle()
+            args.putInt(PREVIOUS_RESULT_KEY, previousResult)
+            fragment!!.arguments = args
+            return fragment!!
+        }
     }
 
     inner class NumberTextWatcher : TextWatcher {
@@ -108,7 +123,11 @@ class FirstFragment : Fragment() {
                     max = p0.toString().toInt()
                 }
 
-                if (min < max) {
+                if (
+                    min < max &&
+                    !binding.minValueEditText.editableText.isNullOrEmpty() &&
+                    !binding.maxValueEditText.editableText.isNullOrEmpty()
+                ) {
                     enableGenerateButton(true)
                 } else {
                     enableGenerateButton(false)
