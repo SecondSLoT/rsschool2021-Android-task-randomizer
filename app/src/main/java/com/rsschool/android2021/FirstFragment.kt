@@ -61,8 +61,11 @@ class FirstFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        binding.minValueEditText.text = null
-        binding.maxValueEditText.text = null
+        val clearInputFields = arguments?.getBoolean(CLEAR_INPUT_FIELDS_KEY, false)
+        if (clearInputFields!!) {
+            binding.minValueEditText.text = null
+            binding.maxValueEditText.text = null
+        }
     }
 
     private fun enableGenerateButton(enable: Boolean) {
@@ -82,16 +85,18 @@ class FirstFragment : Fragment() {
     companion object {
 
         private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
+        private const val CLEAR_INPUT_FIELDS_KEY = "CLEAR_INPUT_FIELDS"
         private var fragment: FirstFragment? = null
 
         @JvmStatic
-        fun getInstance(previousResult: Int): FirstFragment {
+        fun getInstance(previousResult: Int, clearInputFields: Boolean): FirstFragment {
             if (fragment == null) {
                 fragment = FirstFragment()
             }
 
             val args = Bundle()
             args.putInt(PREVIOUS_RESULT_KEY, previousResult)
+            args.putBoolean(CLEAR_INPUT_FIELDS_KEY, clearInputFields)
             fragment!!.arguments = args
             return fragment!!
         }

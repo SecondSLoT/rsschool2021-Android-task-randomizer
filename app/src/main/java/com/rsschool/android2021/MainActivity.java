@@ -13,11 +13,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        openFirstFragment(0);
+        openFirstFragment(0, false);
     }
 
-    private void openFirstFragment(int previousNumber) {
-        startFragment(FirstFragment.getInstance(previousNumber));
+    private void openFirstFragment(int previousNumber, Boolean clearInputFields) {
+        startFragment(FirstFragment.getInstance(previousNumber, clearInputFields));
     }
 
     private void openSecondFragment(int min, int max) {
@@ -38,6 +38,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackButtonClicked(int previousNumber) {
-        openFirstFragment(previousNumber);
+        openFirstFragment(previousNumber, true);
     }
 }
