@@ -64,7 +64,7 @@ class SecondFragment() : Fragment() {
     }
 
     private fun generate(min: Int, max: Int): Int {
-        return Random.nextInt(min, max)
+        return Random.nextInt(min, max + 1)
     }
 
     override fun onDestroyView() {
@@ -81,19 +81,15 @@ class SecondFragment() : Fragment() {
 
         private const val MIN_VALUE_KEY = "MIN_VALUE"
         private const val MAX_VALUE_KEY = "MAX_VALUE"
-        private var fragment: SecondFragment? = null
 
         @JvmStatic
-        fun getInstance(min: Int, max: Int): SecondFragment {
-            if (fragment == null) {
-                fragment = SecondFragment()
-            }
-
+        fun newInstance(min: Int, max: Int): SecondFragment {
+            val fragment = SecondFragment()
             val args = Bundle()
             args.putInt(MIN_VALUE_KEY, min)
             args.putInt(MAX_VALUE_KEY, max)
-            fragment!!.arguments = args
-            return fragment!!
+            fragment.arguments = args
+            return fragment
         }
     }
 }
