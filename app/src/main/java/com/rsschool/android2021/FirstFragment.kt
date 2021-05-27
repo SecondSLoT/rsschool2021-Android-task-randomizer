@@ -47,6 +47,7 @@ class FirstFragment : Fragment() {
         val previousResultString = "Previous result: $result"
         binding.previousResult.text = previousResultString
 
+
         enableGenerateButton(false)
         val numberTextWatcher = NumberTextWatcher()
         binding.minValueEditText.addTextChangedListener(numberTextWatcher)
@@ -56,15 +57,6 @@ class FirstFragment : Fragment() {
             val min = binding.minValueEditText.text.toString().toInt()
             val max = binding.maxValueEditText.text.toString().toInt()
             callbacks?.onGenerateButtonClicked(min, max)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val clearInputFields = arguments?.getBoolean(CLEAR_INPUT_FIELDS_KEY, false)
-        if (clearInputFields!!) {
-            binding.minValueEditText.text = null
-            binding.maxValueEditText.text = null
         }
     }
 
@@ -85,20 +77,14 @@ class FirstFragment : Fragment() {
     companion object {
 
         private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
-        private const val CLEAR_INPUT_FIELDS_KEY = "CLEAR_INPUT_FIELDS"
-        private var fragment: FirstFragment? = null
 
         @JvmStatic
-        fun getInstance(previousResult: Int, clearInputFields: Boolean): FirstFragment {
-            if (fragment == null) {
-                fragment = FirstFragment()
-            }
-
+        fun newInstance(previousResult: Int): FirstFragment {
+            val fragment = FirstFragment()
             val args = Bundle()
             args.putInt(PREVIOUS_RESULT_KEY, previousResult)
-            args.putBoolean(CLEAR_INPUT_FIELDS_KEY, clearInputFields)
-            fragment!!.arguments = args
-            return fragment!!
+            fragment.arguments = args
+            return fragment
         }
     }
 
