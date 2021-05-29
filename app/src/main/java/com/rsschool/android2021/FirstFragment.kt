@@ -106,7 +106,7 @@ class FirstFragment : Fragment() {
                 return
             }
 
-            if (value < Int.MAX_VALUE) {
+            if (value <= Int.MAX_VALUE) {
 
                 if (p0 == binding.minValueEditText.editableText) {
                     min = p0.toString().toInt()
