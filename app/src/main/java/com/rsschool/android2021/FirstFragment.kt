@@ -115,7 +115,7 @@ class FirstFragment : Fragment() {
                 }
 
                 if (
-                    min < max &&
+                    min <= max &&
                     !binding.minValueEditText.editableText.isNullOrEmpty() &&
                     !binding.maxValueEditText.editableText.isNullOrEmpty()
                 ) {
