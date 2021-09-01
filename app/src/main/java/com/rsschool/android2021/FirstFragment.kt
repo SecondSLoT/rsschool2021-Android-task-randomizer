@@ -108,16 +108,16 @@ class FirstFragment : Fragment() {
 
             if (value <= Int.MAX_VALUE) {
 
-                if (p0 == binding.minValueEditText.editableText) {
+                if (p0 === binding.minValueEditText.editableText) {
                     min = p0.toString().toInt()
-                } else if (p0 == binding.maxValueEditText.editableText) {
+                } else if (p0 === binding.maxValueEditText.editableText) {
                     max = p0.toString().toInt()
                 }
 
                 if (
                     min <= max &&
-                    !binding.minValueEditText.editableText.isNullOrEmpty() &&
-                    !binding.maxValueEditText.editableText.isNullOrEmpty()
+                    binding.minValueEditText.editableText.toString().toIntOrNull() != null &&
+                    binding.maxValueEditText.editableText.toString().toIntOrNull() != null
                 ) {
                     enableGenerateButton(true)
                 } else {
