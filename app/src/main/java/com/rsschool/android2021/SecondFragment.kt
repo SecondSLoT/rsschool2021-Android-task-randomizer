@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.rsschool.android2021.databinding.FragmentSecondBinding
 import java.lang.RuntimeException
-import kotlin.random.Random
 
 class SecondFragment() : Fragment() {
 
@@ -55,12 +54,9 @@ class SecondFragment() : Fragment() {
 
         requireActivity()
             .onBackPressedDispatcher
-            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
-                }
-            })
-
+            .addCallback(viewLifecycleOwner) {
+                callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
+            }
     }
 
     private fun generate(min: Int, max: Int): Int {
