@@ -2,25 +2,26 @@ package com.rsschool.android2021
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import com.rsschool.android2021.databinding.FragmentFirstBinding
-import java.lang.RuntimeException
+import com.rsschool.android2021.ui.firstscreen.FirstScreen
 
 class FirstFragment : Fragment() {
-
-    private var _binding: FragmentFirstBinding? = null
-    private val binding
-        get() = _binding!!
-    private var callbacks: Callbacks? = null
 
     interface Callbacks {
         fun onGenerateButtonClicked(min: Int, max: Int)
     }
+
+    private var callbacks: Callbacks? = null
+    private var previousResult = mutableStateOf(0)
+    private var minText = mutableStateOf("")
+    private var maxText = mutableStateOf("")
+    private var isGenerateButtonEnabled = mutableStateOf(false)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -36,37 +37,65 @@ class FirstFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                FirstScreen(
+                    previousResult = previousResult,
+                    minText = minText,
+                    onMinValueChange = ::onMinValueChange,
+                    maxText = maxText,
+                    onMaxValueChange = ::onMaxValueChange,
+                    isGenerateButtonEnabled = isGenerateButtonEnabled,
+                    onGenerateButtonClick = ::onGenerateButtonClick,
+                )
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val result = arguments?.getInt(PREVIOUS_RESULT_KEY)
-        val previousResultString = "Previous result: $result"
-        binding.previousResult.text = previousResultString
+        val result = arguments?.getInt(PREVIOUS_RESULT_KEY) ?: 0
+        previousResult.value = result
+    }
 
+    private fun onMinValueChange(text: String) {
+        if (isTextValid(text)) {
+            minText.value = text
+        }
+        onTextChange()
+    }
 
-        enableGenerateButton(false)
-        val numberTextWatcher = NumberTextWatcher()
-        binding.minValueEditText.addTextChangedListener(numberTextWatcher)
-        binding.maxValueEditText.addTextChangedListener(numberTextWatcher)
+    private fun onMaxValueChange(text: String) {
+        if (isTextValid(text)) {
+            maxText.value = text
+        }
+        onTextChange()
+    }
 
-        binding.generateButton.setOnClickListener {
-            val min = binding.minValueEditText.text.toString().toInt()
-            val max = binding.maxValueEditText.text.toString().toInt()
-            callbacks?.onGenerateButtonClicked(min, max)
+    private fun isTextValid(text: String): Boolean {
+        val number = text.toIntOrNull()
+        return number != null || text == ""
+    }
+
+    private fun onTextChange() {
+        val min = minText.value.toIntOrNull()
+        val max = maxText.value.toIntOrNull()
+
+        if (min != null && max != null && min <= max) {
+            enableGenerateButton(true)
+        } else {
+            enableGenerateButton(false)
         }
     }
 
     private fun enableGenerateButton(enable: Boolean) {
-        binding.generateButton.isEnabled = enable
+        isGenerateButtonEnabled.value = enable
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun onGenerateButtonClick() {
+        callbacks?.onGenerateButtonClicked(minText.value.toInt(), maxText.value.toInt())
     }
 
     override fun onDetach() {
@@ -76,7 +105,7 @@ class FirstFragment : Fragment() {
 
     companion object {
 
-        private const val PREVIOUS_RESULT_KEY = "PREVIOUS_RESULT"
+        private const val PREVIOUS_RESULT_KEY = "previous_result"
 
         @JvmStatic
         fun newInstance(previousResult: Int): FirstFragment {
@@ -85,47 +114,6 @@ class FirstFragment : Fragment() {
             args.putInt(PREVIOUS_RESULT_KEY, previousResult)
             fragment.arguments = args
             return fragment
-        }
-    }
-
-    inner class NumberTextWatcher : TextWatcher {
-        private var min = 0
-        private var max = 0
-
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        }
-
-        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        }
-
-        override fun afterTextChanged(p0: Editable?) {
-            val value = p0.toString().toIntOrNull()
-
-            if (value == null) {
-                enableGenerateButton(false)
-                return
-            }
-
-            if (value <= Int.MAX_VALUE) {
-
-                if (p0 === binding.minValueEditText.editableText) {
-                    min = p0.toString().toInt()
-                } else if (p0 === binding.maxValueEditText.editableText) {
-                    max = p0.toString().toInt()
-                }
-
-                if (
-                    min <= max &&
-                    binding.minValueEditText.editableText.toString().toIntOrNull() != null &&
-                    binding.maxValueEditText.editableText.toString().toIntOrNull() != null
-                ) {
-                    enableGenerateButton(true)
-                } else {
-                    enableGenerateButton(false)
-                }
-            } else {
-                enableGenerateButton(false)
-            }
         }
     }
 }

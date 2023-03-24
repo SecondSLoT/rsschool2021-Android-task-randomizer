@@ -6,21 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import com.rsschool.android2021.databinding.FragmentSecondBinding
-import java.lang.RuntimeException
+import com.rsschool.android2021.ui.SecondScreen
 
 class SecondFragment() : Fragment() {
-
-    private var _binding: FragmentSecondBinding? = null
-    private val binding
-        get() = _binding!!
-
-    private var callbacks: Callbacks? = null
 
     interface Callbacks {
         fun onBackButtonClicked(previousNumber: Int)
     }
+
+    private var callbacks: Callbacks? = null
+    private var result: Int = 0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -36,36 +34,34 @@ class SecondFragment() : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
+            val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
+            result = generateRandomBetweenInts(min, max)
+
+            setContent {
+                SecondScreen(
+                    result = result.toString(),
+                    onBackButtonClick = ::onBackButtonClick,
+                )
+            }
+        }
+    }
+
+    private fun onBackButtonClick() {
+        callbacks?.onBackButtonClicked(result)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
-        val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
-
-        binding.result.text = generate(min, max).toString()
-
-        binding.backButton.setOnClickListener {
-            callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
-        }
-
         requireActivity()
             .onBackPressedDispatcher
-            .addCallback(viewLifecycleOwner) {
-                callbacks?.onBackButtonClicked(binding.result.text.toString().toInt())
-            }
+            .addCallback(viewLifecycleOwner) { onBackButtonClick() }
     }
 
-    private fun generate(min: Int, max: Int): Int {
+    private fun generateRandomBetweenInts(min: Int, max: Int): Int {
         return (min..max).random()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onDetach() {
